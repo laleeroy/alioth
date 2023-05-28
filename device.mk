@@ -52,16 +52,9 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.sip.voip.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.sip.voip.xml \
     frameworks/native/data/etc/android.software.verified_boot.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.verified_boot.xml
 
-ifeq ($(TARGET_IS_VAB),true)
-VULKAN_DEQP_LEVEL := 2020-03-01
-else
-VULKAN_DEQP_LEVEL := 2019-03-01
-endif
-PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.software.vulkan.deqp.level-$(VULKAN_DEQP_LEVEL).xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.vulkan.deqp.level.xml
-
 # A/B
-ifeq ($(TARGET_IS_VAB),true)
+TARGET_IS_VAB := true
+VULKAN_DEQP_LEVEL := 2020-03-01
 # Inherit virtual_ab_ota product
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 
@@ -93,8 +86,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     checkpoint_gc \
     otapreopt_script
-endif
 
+# AAPT
+PRODUCT_AAPT_CONFIG := normal
+PRODUCT_AAPT_PREF_CONFIG := xxhdpi
+ 
 # ANT+
 PRODUCT_PACKAGES += \
     com.dsi.ant@1.0.vendor
@@ -137,7 +133,7 @@ PRODUCT_PACKAGES += \
 
 # Audio configs
 PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/audio/,$(TARGET_COPY_OUT_VENDOR)/etc)
+    $(call find-copy-subdir-files,*,$(LOCAL_PATH)/configs/audio/,$(TARGET_COPY_OUT_VENDOR)/etc)
 
 PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/bluetooth_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_audio_policy_configuration.xml \
@@ -151,7 +147,14 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.btconfigstore@1.0.vendor \
     vendor.qti.hardware.btconfigstore@2.0.vendor
 
+# Boot animation
+TARGET_SCREEN_HEIGHT := 2400
+TARGET_SCREEN_WIDTH := 1080
+ 
 # Camera
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/camera/camera_cnf.txt:$(TARGET_COPY_OUT_VENDOR)/etc/camera/camera_cnf.txt
+
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl \
     android.hardware.camera.provider@2.4-service_64
@@ -162,6 +165,9 @@ PRODUCT_PACKAGES += \
     libstdc++.vendor \
     vendor.qti.hardware.camera.device@1.0.vendor \
     vendor.qti.hardware.camera.postproc@1.0.vendor
+
+PRODUCT_PACKAGES += \
+    libpiex_shim
 
 # Configstore
 PRODUCT_PACKAGES += \
@@ -223,14 +229,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.3-service.xiaomi
 
-ifeq ($(TARGET_HAS_UDFPS),true)
-PRODUCT_PACKAGES += \
-    libudfpshandler
-
-PRODUCT_PACKAGES += \
-    vendor.goodix.hardware.biometrics.fingerprint@2.1.vendor
-endif
-
 # Gatekeeper
 PRODUCT_PACKAGES += \
     android.hardware.gatekeeper@1.0.vendor
@@ -243,12 +241,8 @@ PRODUCT_PACKAGES += \
 # Health
 PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl \
-    android.hardware.health@2.1-service
-
-ifneq ($(TARGET_IS_VAB),true)
-PRODUCT_PACKAGES += \
+    android.hardware.health@2.1-service \
     android.hardware.health@2.1-impl.recovery
-endif
 
 # HIDL
 PRODUCT_PACKAGES += \
@@ -259,7 +253,7 @@ PRODUCT_PACKAGES += \
 
 # HotwordEnrollement app permissions
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
+    $(LOCAL_PATH)/configs/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
 
 # IFAAService
 PRODUCT_PACKAGES += \
@@ -418,6 +412,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libsensorndkbridge
 
+# Shipping API level
+PRODUCT_SHIPPING_API_LEVEL := 30
+ 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH) \
@@ -493,4 +490,4 @@ PRODUCT_BOOT_JARS += \
     WfdCommon
 
 # Inherit the proprietary files
-$(call inherit-product, vendor/xiaomi/sm8250-common/sm8250-common-vendor.mk)
+$(call inherit-product, vendor/xiaomi/alioth/alioth-vendor.mk)
