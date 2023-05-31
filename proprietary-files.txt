@@ -1,4 +1,4 @@
-# Unpinned blobs from alioth_global-user 13 RKQ1.211001.001 V14.0.4.0.TKHMIXM release-keys
+# Unpinned blobs are extracted from alioth V14.0.4.0.TKHMIXM
 
 # ACDB
 vendor/etc/acdbdata/Forte/Forte_Bluetooth_cal.acdb
